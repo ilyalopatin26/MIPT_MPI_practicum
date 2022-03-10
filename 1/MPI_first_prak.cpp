@@ -27,6 +27,10 @@ void parser (std::vector<std::string> &A,  long long & N ) {
 
 int main ( int argc, char* argv[] ) 
 {
+    std::ios_base::sync_with_stdio (false);
+    std::cin.tie( nullptr );
+    std::cout.tie( nullptr );
+
     int rank, size;
     double start_time, end_time;
 
