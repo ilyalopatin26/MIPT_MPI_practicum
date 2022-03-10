@@ -60,7 +60,8 @@ int main ( int argc, char* argv[] )
 
     MPI_Barrier(MPI_COMM_WORLD);
     
-    start_time = MPI_Wtime();
+    if ( rank == 0 )
+        start_time = MPI_Wtime();
 
     for ( i = rank; i < N ; i += size ) 
     {
@@ -73,11 +74,10 @@ int main ( int argc, char* argv[] )
 
     MPI_Barrier(MPI_COMM_WORLD);
     
-    end_time = MPI_Wtime();
 
     if ( rank==0 ) // вывод
     {
-        
+        end_time = MPI_Wtime();
         std::cout.setf(std::ios::fixed);  // вывод в фиксированном формате 
         std::cout.precision(9); 
 

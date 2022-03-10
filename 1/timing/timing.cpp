@@ -30,7 +30,7 @@ int main ( int argc, char* argv[] )
     std::ios_base::sync_with_stdio (false);
     std::cin.tie( nullptr );
     std::cout.tie( nullptr );
-    
+
     int rank, size;
     double start_time, end_time;
 
@@ -60,7 +60,8 @@ int main ( int argc, char* argv[] )
 
     MPI_Barrier(MPI_COMM_WORLD);
     
-    start_time = MPI_Wtime();
+    if ( rank == 0 )
+        start_time = MPI_Wtime();
 
     for ( i = rank; i < N ; i += size ) 
     {
@@ -73,11 +74,11 @@ int main ( int argc, char* argv[] )
 
     MPI_Barrier(MPI_COMM_WORLD);
     
-    end_time = MPI_Wtime();
+
 
     if ( rank==0 ) // вывод
     {
-        
+        end_time = MPI_Wtime();   
         std::cout.setf(std::ios::fixed);  // вывод в фиксированном формате 
         std::cout.precision(9); 
 
