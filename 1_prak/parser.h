@@ -4,7 +4,8 @@ void print_unknow_flag ( const std::string &flag ) {
     return;
 }
 
-bool parser (std::vector<std::string> &Arg, bool &flag_res, bool &flag_segment, long long &N ) {
+bool parser (std::vector<std::string> &Arg, bool &flag_res, bool &flag_segment,
+                bool &flag_consistently , long long &N ) {
     for ( auto it : Arg) {
         if ( it[0] == '-' ) {
             if ( it.size() == 1 ) {
@@ -27,6 +28,17 @@ bool parser (std::vector<std::string> &Arg, bool &flag_res, bool &flag_segment, 
             case 's':
                 if ( it.size() == 2) {
                     flag_segment = true;
+                    break;
+                }
+                else 
+                {
+                    print_unknow_flag ( it );
+                    return false;
+                    break; 
+                }
+            case 'c' :
+                if ( it.size() == 2) {
+                    flag_consistently = true;
                     break;
                 }
                 else 
