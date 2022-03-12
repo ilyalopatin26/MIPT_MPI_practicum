@@ -1,19 +1,40 @@
 
+void print_unknow_flag ( const std::string &flag ) {
+    std::cerr<<"unknow flag: "<<flag<<'\n';
+    return;
+}
+
 bool parser (std::vector<std::string> &Arg, bool &flag_res, bool &flag_segment, long long &N ) {
     for ( auto it : Arg) {
         if ( it[0] == '-' ) {
             if ( it.size() == 1 ) {
-                std::cout<<"нет флага после -"<<'\n';
+                std::cerr<<"нет флага после -"<<'\n';
                 return false;
             }
             switch ( it[1] )
             {
             case 't':
-                flag_res = false;
-                break;
+                if ( it.size() == 2) {
+                    flag_res = false;
+                    break;
+                }
+                else 
+                {
+                    print_unknow_flag ( it );
+                    return false;
+                    break; 
+                }
             case 's':
-                flag_segment = true;
-                break;
+                if ( it.size() == 2) {
+                    flag_segment = true;
+                    break;
+                }
+                else 
+                {
+                    print_unknow_flag ( it );
+                    return false;
+                    break; 
+                }
             case 'N': {
                 unsigned int idx = 2;
                 if ( it[2] == 'e' )
@@ -31,9 +52,16 @@ bool parser (std::vector<std::string> &Arg, bool &flag_res, bool &flag_segment, 
                 break;     
                 }
             case 'n':
-                break;                       
+                if ( it[2] == 'p' && it.size() == 3 )
+                    break;
+                else 
+                {
+                    print_unknow_flag ( it );
+                    return false;
+                    break;
+                }                        
             default:
-                std::cout<< "unknow flag \n";
+                print_unknow_flag ( it );
                 return false;
                 break;
             }
