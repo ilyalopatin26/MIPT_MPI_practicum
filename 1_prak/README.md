@@ -41,9 +41,12 @@ single_run.sh запускает программу только для указ
 ```
 ./single_run.sh 5 -s
 ```
-**Важно**: в случае запуска single_run необходимл указывать число процессов первым аргументом!
+**Важно**: в случае запуска single_run необходимо указывать число процессов первым аргументом!
 
-
+Таблица с результатми запуска:
+```
+https://docs.google.com/spreadsheets/d/1r-K5XvxBRkn0eHm-PJIC6Zc3dum-m6y7gpXsyoHHezg/edit?usp=sharing
+```
 
 
 
