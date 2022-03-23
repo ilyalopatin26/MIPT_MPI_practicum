@@ -74,14 +74,17 @@ int main (int argc, char* argv[])
         loc_summ += s ;
     }
     
+    if ( flag_segment  && ( myrank != 0 ) )
+        MPI_Send( &loc_summ , 1 , MPI_LONG_DOUBLE , 0  , 0 , MPI_COMM_WORLD );
+
+
     MPI_Reduce( &loc_summ, &global_summ, 1, MPI_LONG_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
     
     MPI_Barrier(MPI_COMM_WORLD);
     if ( myrank == 0 )
         end = MPI_Wtime();
     
-    if ( flag_segment  && ( myrank != 0 ) )
-        MPI_Send( &loc_summ , 1 , MPI_LONG_DOUBLE , 0  , 0 , MPI_COMM_WORLD );
+
 
     if ( myrank == 0 )
     {        

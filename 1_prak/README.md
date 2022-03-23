@@ -1,5 +1,13 @@
 # Практическая работа №1
 
+Папка содержит следующие файлы:
+```
+calcul.cpp - точное выполнение ТЗ
+MPI_calcul.cpp - решение тоже задачи с дополнительными возможностями
+graph.png - требуемый график ускорений
+```
+остальные файлы нужны для компиляции и запуска MPI_calcul.cpp, речь о которой ниже
+
 ## Компиляция 
 ```
 git clone https://github.com/Ilya-Lopatin/MIPT_MPI_practicum.git
@@ -43,10 +51,6 @@ single_run.sh запускает программу только для указ
 ```
 **Важно**: в случае запуска single_run необходимо указывать число процессов первым аргументом!
 
-Таблица с результатми запуска:
-```
-https://docs.google.com/spreadsheets/d/1r-K5XvxBRkn0eHm-PJIC6Zc3dum-m6y7gpXsyoHHezg/edit?usp=sharing
-```
 
 
 
