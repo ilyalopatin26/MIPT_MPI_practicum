@@ -5,6 +5,32 @@
 #include <unistd.h>
 #include <cmath>
 
+long double h_in = 0.02 ,
+            k = 1 , 
+            l = 1 ,
+            u0 = 1 ,
+            dt = 0.0002 ,
+            t_target = 0.1 ;
+
+long double pi = 3.14159265358979323846 ;            
+
+long double get_exact_sol ( 
+    const long double x, const long double t, const long double eps ) 
+{
+    if (   x <= 1e-7 ||  1 - x <= 1e-7   )
+        return 0;
+    long double crit = pi * eps * x / ( 5 * l * u0 );
+    long double sum = 0; 
+    long int m = 0; 
+    long double a_m = exp( - k * pi * pi *  t / ( l * l )  ) / ( 2 * m +1 );
+    sum += a_m * sin ( pi * x / l );
+    while ( a_m >= crit ) {
+        ++m;
+        a_m = exp( - k * pi * pi * (2*m+1)*(2*m+1) * t / ( l * l )  ) / ( 2 * m +1 );
+        sum +=  a_m  * sin ( pi * x * ( 2 * m +1 ) / l );
+    }  
+    return sum * 4 * u0 / ( pi );
+}
 
 long double first_phase ( 
     const int k, const long double* left, const long double* right ) 
@@ -52,19 +78,10 @@ int main ( int argc, char* argv[] )
     MPI_Status status;   
     int myrank, size, error;
 
-    long double h_in = 0.02 ,
-                k = 1 , 
-                l = 1 ,
-                u0 = 5 ,
-                dt = 0.0002 ,
-                eps = dt / 2 ,
-                t_target = 0.1 ;
-
-    long int Nnode =  ceil( l / h_in );
-    long double h = l / Nnode;
+    long int Nnode =  ceil( l / h_in )+1 ;
+    long double h = l / (Nnode-1);
     long double kr = (dt * k) / ( h*h );
     std::vector<long double> ans;
-
     
     MPI_Init (&argc, &argv);
     MPI_Comm_rank (MPI_COMM_WORLD, &myrank);
@@ -145,8 +162,15 @@ int main ( int argc, char* argv[] )
                 ans.push_back (mes[j]);   
             delete [] mes; 
         }
+        /*
         for ( auto it : ans )
             printf("%Lf \n", it);
+        */
+
+        for ( int i = 0; i <= 50 ; i += 5 ) {
+            long double temp = get_exact_sol ( i * 0.02, t_target, ans[i]*0.1 );
+            printf("%Lf, %Lf \n", ans[i], temp );
+        }
     }    
     
 
