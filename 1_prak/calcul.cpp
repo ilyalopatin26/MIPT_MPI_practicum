@@ -29,7 +29,7 @@ long double consistently ()
 }
 
 
-int main (int argc, char* argv[])
+int main (int argc, char* argv[] )
 {
     MPI_Status status;                                            
 
@@ -88,8 +88,8 @@ int main (int argc, char* argv[])
     }
     
     if ( myrank != 0 ) 
-        MPI_Recv( &work_interval[0] , 2 , MPI_LONG_DOUBLE , 0 , 0 , MPI_COMM_WORLD, &status );
-    
+        MPI_Recv( &work_interval[0] , 2 , MPI_LONG_DOUBLE , 0 , 0 , MPI_COMM_WORLD, &status ); 
+                                                                                                                                                                                                                                      
     // здесь все процессы знают свою обласль интегрирования
 
 
