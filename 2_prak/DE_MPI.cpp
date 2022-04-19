@@ -77,6 +77,7 @@ int main ( int argc, char* argv[] )
 {
     MPI_Status status;   
     int myrank, size, error;
+    long double beginT, endT;
 
     long int Nnode =  ceil( l / h_in )+1 ;
     long double h = l / (Nnode-1);
@@ -87,7 +88,9 @@ int main ( int argc, char* argv[] )
     MPI_Comm_rank (MPI_COMM_WORLD, &myrank);
     MPI_Comm_size (MPI_COMM_WORLD, &size );
     MPI_Barrier( MPI_COMM_WORLD );
-    
+    if ( myrank == 0 )
+        beginT = MPI_Wtime();
+        
     long double t_curr = 0;
 
     long int my_quant = Nnode / size;
@@ -162,6 +165,7 @@ int main ( int argc, char* argv[] )
                 ans.push_back (mes[j]);   
             delete [] mes; 
         }
+        endT = MPI_Wtime(); 
         /*
         for ( auto it : ans )
             printf("%Lf \n", it);
@@ -171,6 +175,7 @@ int main ( int argc, char* argv[] )
             long double temp = get_exact_sol ( i * 0.02, t_target, ans[i]*0.1 );
             printf("%Lf, %Lf \n", ans[i], temp );
         }
+        printf("time: %Lf \n", (endT - beginT) );
     }    
     
 
