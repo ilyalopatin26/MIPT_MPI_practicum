@@ -10,7 +10,7 @@ long double h_in = 0.02 ,
             l = 1 ,
             u0 = 1 ,
             dt = 0.0002 ,
-            t_target = 0.1 ;
+            t_target = 0.1;
 
 long double pi = 3.14159265358979323846 ;            
 
@@ -168,13 +168,14 @@ int main ( int argc, char* argv[] )
         endT = MPI_Wtime(); 
         /*
         for ( auto it : ans )
-            printf("%Lf \n", it);
+            printf("%Lf, ", it);
         */
-
+       
         for ( int i = 0; i <= 50 ; i += 5 ) {
-            long double temp = get_exact_sol ( i * 0.02, t_target, ans[i]*0.1 );
+            long double temp = get_exact_sol ( i * 0.02, t_target, 1e-7 );
             printf("%Lf, %Lf \n", ans[i], temp );
-        }
+            //printf("%Lf, ", ans[i]);
+        } 
         printf("time: %Lf \n", (endT - beginT) );
     }    
     
