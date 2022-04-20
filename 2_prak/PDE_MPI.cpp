@@ -120,7 +120,7 @@ int main ( int argc, char* argv[] )
         
         MPI_Barrier( MPI_COMM_WORLD );
     
-        if ( myrank % 2 == 0 )
+        if (  ( myrank % 2 == 0 )  && ( myrank != 0 )  )
             l = second_phase( myrank, &U[0], &U[my_quant-1] );
         if ( (myrank % 2 != 0) && (  myrank + 1 < size )  )
             r = second_phase( myrank, &U[0], &U[my_quant-1] );    
