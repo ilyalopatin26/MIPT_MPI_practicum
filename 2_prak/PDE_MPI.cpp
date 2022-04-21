@@ -17,7 +17,7 @@ long double pi = 3.14159265358979323846 ;
 long double get_exact_sol ( 
     const long double x, const long double t, const long double eps ) 
 {
-    if (   x <= 1e-7 ||  1 - x <= 1e-7   )
+    if (   x <= 1e-7 ||  l - x <= 1e-7   )
         return 0;
     long double crit = pi * eps * x / ( 5 * l * u0 );
     long double sum = 0; 
@@ -32,45 +32,38 @@ long double get_exact_sol (
     return sum * 4 * u0 / ( pi );
 }
 
-long double first_phase ( 
-    const int k, const long double* left, const long double* right ) 
+long double exch_mess ( 
+    const int k, const long double* left, const long double* right, const int ph ) 
 {
     MPI_Status status;
     long double* get_value = new long double[1];
     
     if ( k % 2 == 0 )
-        MPI_Send ( &right[0], 1, MPI_LONG_DOUBLE , k+1 , 0, MPI_COMM_WORLD );
+        if ( ph == 1 )
+            MPI_Send ( &right[0], 1, MPI_LONG_DOUBLE , k+1 , 0, MPI_COMM_WORLD );
+        else
+            MPI_Recv( &get_value[0] , 1 , MPI_LONG_DOUBLE , k-1 , 0 , MPI_COMM_WORLD, &status );
     else
-        MPI_Recv( &get_value[0] , 1 , MPI_LONG_DOUBLE , k-1 , 0 , MPI_COMM_WORLD, &status );
+        if ( ph == 1 )
+            MPI_Recv( &get_value[0] , 1 , MPI_LONG_DOUBLE , k-1 , 0 , MPI_COMM_WORLD, &status );
+        else
+            MPI_Send ( &right[0], 1, MPI_LONG_DOUBLE , k+1 , 0, MPI_COMM_WORLD );
 
-    if ( k % 2 != 0 )
-        MPI_Send ( &left[0], 1, MPI_LONG_DOUBLE , k-1 , 0, MPI_COMM_WORLD );    
+
+    if ( k % 2 == 0 )
+        if ( ph == 1 )
+            MPI_Recv( &get_value[0] , 1 , MPI_LONG_DOUBLE , k+1 , 0 , MPI_COMM_WORLD, &status );    
+        else
+            MPI_Send ( &left[0], 1, MPI_LONG_DOUBLE , k-1 , 0, MPI_COMM_WORLD );
     else
-        MPI_Recv( &get_value[0] , 1 , MPI_LONG_DOUBLE , k+1 , 0 , MPI_COMM_WORLD, &status );
+        if ( ph == 1 )
+            MPI_Send ( &left[0], 1, MPI_LONG_DOUBLE , k-1 , 0, MPI_COMM_WORLD );
+        else
+            MPI_Recv( &get_value[0] , 1 , MPI_LONG_DOUBLE , k+1 , 0 , MPI_COMM_WORLD, &status );
+
     long double ans = get_value[0];
     delete [] get_value;
     return ans;
-}
-
-long double second_phase (
-    const int k, const long double* left, const long double* right )
-{
-    MPI_Status status;
-    long double* get_value = new long double[1];
-
-    if ( k % 2 == 0 ) 
-        MPI_Recv( &get_value[0] , 1 , MPI_LONG_DOUBLE , k-1 , 0 , MPI_COMM_WORLD, &status );
-    else
-        MPI_Send ( &right[0], 1, MPI_LONG_DOUBLE , k+1 , 0, MPI_COMM_WORLD );
-
-    if ( k % 2 == 0 )
-        MPI_Send ( &left[0], 1, MPI_LONG_DOUBLE , k-1 , 0, MPI_COMM_WORLD );
-    else
-        MPI_Recv( &get_value[0] , 1 , MPI_LONG_DOUBLE , k+1 , 0 , MPI_COMM_WORLD, &status );
-
-    long double ans = get_value[0];
-    delete [] get_value;
-    return ans;    
 }
 
 int main ( int argc, char* argv[] )
@@ -79,8 +72,11 @@ int main ( int argc, char* argv[] )
     int myrank, size, error;
     long double beginT, endT;
 
-    long int Nnode =  ceil( l / h_in )+1 ;
+    //long int Nnode =  ceil( l / h_in )+1 ;
+    long int Nnode = 51 ;
     long double h = l / (Nnode-1);
+    //dt = ( h*h ) / (2 * k); 
+    dt =0.0002;
     long double kr = (dt * k) / ( h*h );
     std::vector<long double> ans;
     
@@ -114,16 +110,16 @@ int main ( int argc, char* argv[] )
         long double l, r;
         
         if ( myrank % 2 != 0 )
-            l = first_phase( myrank, &U[0], &U[my_quant-1] );
+            l = exch_mess( myrank, &U[0], &U[my_quant-1] , 1 );
         if ( ( myrank % 2 == 0 ) && ( myrank != size - 1 )  )
-            r = first_phase( myrank, &U[0], &U[my_quant-1] );
+            r = exch_mess( myrank, &U[0], &U[my_quant-1] , 1 );
         
         MPI_Barrier( MPI_COMM_WORLD );
     
         if (  ( myrank % 2 == 0 )  && ( myrank != 0 )  )
-            l = second_phase( myrank, &U[0], &U[my_quant-1] );
+            l = exch_mess( myrank, &U[0], &U[my_quant-1] , 2);
         if ( (myrank % 2 != 0) && (  myrank + 1 < size )  )
-            r = second_phase( myrank, &U[0], &U[my_quant-1] );    
+            r = exch_mess( myrank, &U[0], &U[my_quant-1] , 2 );    
 
         for ( int i =1 ; i < my_quant-1 ; i++ )
             U_n[i] = kr * ( U[i+1] + U[i-1] - 2 * U[i] ) ;
