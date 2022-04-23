@@ -118,8 +118,10 @@ int main ( int argc, char* argv[] )
     {
         dt =  ( h * h ) / ( 2 * k ) ;
         kr = (dt * k) / ( h * h );
+        /*
         if ( myrank == 0 )
-            printf("the Courant condition is not satisfied \n");
+            printf("the Courant condition is not satisfied \n"); 
+        */
     }
 
 
@@ -193,12 +195,13 @@ int main ( int argc, char* argv[] )
             delete [] mes; 
         }
         endT = MPI_Wtime(); 
-       
+       /*
         for ( int i = 0; i <= 50 ; i += 5 ) {
-            long double temp = get_exact_sol ( i * h, t_target, 1e-7 );
+            long double temp = get_exact_sol ( i * 0.02, t_target, 1e-7 );
             printf("%Lf, %Lf \n", ans[i], temp );
-        } 
-        printf("time: %Lf \n", (endT - beginT) );
+        }
+        */ 
+        printf("%Lf \n", (endT - beginT) );
     }    
     
     delete [] U;
