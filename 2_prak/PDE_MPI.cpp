@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <cmath>
 
+#include "parser.h"
+
 //default
 long double h = 0.02 ,
             k = 1.0 , 
@@ -79,8 +81,21 @@ int main ( int argc, char* argv[] )
     MPI_Status status;   
     int myrank, size, error;
     long double beginT, endT;
+
+    bool flag_time = false;
     
     long int Nnode = 51 ;
+
+    //обработка флагов
+    std::vector<std::string> Arg(argc-1);
+    for (int i = 1; i < argc; ++i )
+        Arg[i-1] = argv[i];
+    bool er =  parser( Arg, flag_time ); 
+    if ( !er ) {
+        std::cerr<<"error parser" << '\n';
+        MPI_Finalize();
+        return 0 ;
+    }
 
     std::ifstream IN ("./IN.txt");
     std::string skip_l ,
@@ -98,7 +113,8 @@ int main ( int argc, char* argv[] )
     else 
     {
         std::cerr<<"Can not open IN.txt"<<'\n';
-        exit(0);
+        MPI_Finalize();
+        return 0 ;
     }
     IN.close(); 
 
@@ -118,7 +134,7 @@ int main ( int argc, char* argv[] )
     {
         dt =  ( h * h ) / ( 2 * k ) ;
         kr = (dt * k) / ( h * h );
-        if ( myrank == 0 )
+        if ( myrank == 0 && !flag_time )
             printf("the Courant condition is not satisfied \n");
     }
 
@@ -194,11 +210,15 @@ int main ( int argc, char* argv[] )
         }
         endT = MPI_Wtime(); 
        
-        for ( int i = 0; i <= 50 ; i += 5 ) {
-            long double temp = get_exact_sol ( i * h, t_target, 1e-7 );
-            printf("%Lf, %Lf \n", ans[i], temp );
-        } 
-        printf("time: %Lf \n", (endT - beginT) );
+       if ( !flag_time ) {
+            for ( int i = 0; i <= 50 ; i += 5 ) {
+                long double temp = get_exact_sol ( i * h, t_target, 1e-7 );
+                printf("%Lf, %Lf \n", ans[i], temp );
+            }
+            printf("time: %Lf \n", (endT - beginT) ); 
+        }
+        else 
+            printf("%Lf \n", (endT - beginT) );
     }    
     
     delete [] U;
