@@ -187,6 +187,7 @@ int main ( int argc, char* argv[] )
         endT = MPI_Wtime(); 
        
        if ( !flag_time ) {
+           printf("Numerical , Exact \n");
             for ( int i = 0; i <= 50 ; i += 5 ) {
                 long double temp = get_exact_sol ( i * h, t_target, 1e-7 );
                 printf("%Lf, %Lf \n", ans[i], temp );
